@@ -2,31 +2,37 @@ const express = require('express')
 const router = express.Router()
 const shortenerSchema = require('../../models/shortenerSchema')
 const randomString = require('../../public/javascripts/randomString')
+const urlCheck = require('../../public/javascripts/urlCheck')
 
 router.post('/', (req, res) => {
   const originURL = req.body.originURL
   const protocol = req.protocol
   const host = req.headers.host
   const url = req.originalUrl
-  shortenerSchema.find()
-    .lean()
-    .then(results => {
-      const string = randomString(...results)
-      shortenerSchema.create({
-        inputUrl: originURL,
-        repliedString: string
-      })
-      .then(() => {
-        const shortener = `${protocol}://${host}${url}/${string}`
-        res.render('result', { shortener })
+  if (urlCheck(originURL)) {
+    shortenerSchema.find()
+      .lean()
+      .then(results => {
+        const string = randomString(...results)
+        shortenerSchema.create({
+          inputUrl: originURL,
+          repliedString: string
+        })
+        .then(() => {
+          const shortener = `${protocol}://${host}${url}/${string}`
+          res.render('result', { shortener })
+        })
+        .catch(err => {
+          next(err)
+        })
       })
       .catch(err => {
         next(err)
       })
-    })
-    .catch(err => {
-      next(err)
-    })
+  } else {
+    const note = "Please input complete http format"
+    res.render('index', { originURL, note })
+  }
 })
 
 router.get('/:id', (req, res) => {
@@ -35,8 +41,8 @@ router.get('/:id', (req, res) => {
     .then(result => {
       res.redirect(`${result[0].inputUrl}`)
     })
-    .catch(() => {
-      res.send('there is no this record')
+    .catch(err => {
+      res.send('Sorry, we can not find your URL link')
     })
 })
 

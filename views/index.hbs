@@ -1,6 +1,7 @@
 <div class="main shorten">
   <form action="/convert" method="post">
-    <input type="text" name="originURL" id="origin" maxlength="120" placeholder="Input URL here" required>
+    <input type="text" name="originURL" id="origin" maxlength="120" placeholder="Input URL here" value="{{originURL}}" required>
     <button type="submit">Shorten</button>
   </form>
+  <div class="error-remind">{{note}}</div>
 </div>
