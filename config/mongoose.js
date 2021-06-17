@@ -9,7 +9,7 @@ mongoose.connect(MONGODB_URI, {
 const db = mongoose.connection
 
 db.on('error', () => {
-  console.log(err, 'db is not available')
+  console.log('db is not available')
 })
 
 db.once('open', () => {

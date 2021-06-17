@@ -23,11 +23,11 @@ router.post('/', (req, res) => {
           res.render('result', { shortener })
         })
         .catch(err => {
-          next(err)
+          console.log('data mistake')
         })
       })
       .catch(err => {
-        next(err)
+        console.log('data mistake')
       })
   } else {
     const note = "Please input complete http format"
