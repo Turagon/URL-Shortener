@@ -1,6 +1,6 @@
 function isExistedCheck (...dataCollection) {
   let randomResult = randomStringGenerator()
-  const allRandomString = dataCollection.filter(item => item.repliedString)
+  const allRandomString = dataCollection.map(item => item = item.repliedString)
   while (allRandomString.find(item => item === randomResult)) {
     randomResult = randomStringGenerator()
   }
@@ -26,4 +26,4 @@ function randomStringGenerator () {
   }, "")
 }
 
-module.exports = randomStringGenerator
+module.exports = isExistedCheck

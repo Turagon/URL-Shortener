@@ -10,24 +10,31 @@ router.post('/', (req, res) => {
   const host = req.headers.host
   const url = req.originalUrl
   if (urlCheck(originURL)) {
-    shortenerSchema.find()
-      .lean()
-      .then(results => {
-        const string = randomString(...results)
-        shortenerSchema.create({
-          inputUrl: originURL,
-          repliedString: string
-        })
-        .then(() => {
-          const shortener = `${protocol}://${host}${url}/${string}`
-          res.render('result', { shortener })
-        })
-        .catch(err => {
-          console.log('data mistake')
-        })
+    shortenerSchema.find({ inputUrl: originURL })
+      .then(result => {
+        const shortener = `${protocol}://${host}${url}/${result[0].repliedString}`
+        res.render('result', { shortener })
       })
-      .catch(err => {
-        console.log('data mistake')
+      .catch(() => {
+        shortenerSchema.find()
+          .lean()
+          .then(results => {
+            const string = randomString(...results)
+            shortenerSchema.create({
+              inputUrl: originURL,
+              repliedString: string
+            })
+            .then(() => {
+              const shortener = `${protocol}://${host}${url}/${string}`
+              res.render('result', { shortener })
+            })
+            .catch(err => {
+              console.log('data mistake')
+            })
+          })
+          .catch(err => {
+            console.log('data mistake')
+          })
       })
   } else {
     const note = "Please input complete http format"
