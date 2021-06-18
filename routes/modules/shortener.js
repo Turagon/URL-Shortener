@@ -10,31 +10,32 @@ router.post('/', (req, res) => {
   const host = req.headers.host
   const url = req.originalUrl
   if (urlCheck(originURL)) {
-    shortenerSchema.find({ inputUrl: originURL })
-      .then(result => {
-        const shortener = `${protocol}://${host}${url}/${result[0].repliedString}`
-        res.render('result', { shortener })
-      })
-      .catch(() => {
-        shortenerSchema.find()
-          .lean()
-          .then(results => {
-            const string = randomString(...results)
-            shortenerSchema.create({
-              inputUrl: originURL,
-              repliedString: string
-            })
-            .then(() => {
-              const shortener = `${protocol}://${host}${url}/${string}`
-              res.render('result', { shortener })
-            })
-            .catch(err => {
-              console.log('data mistake')
-            })
+    shortenerSchema.find()
+      .lean()
+      .then(results => {
+        const containDuplicate = results.filter(item => {
+          return item.inputUrl === originURL
+        })
+        if (!containDuplicate[0]) {
+          const string = randomString(...results)
+          shortenerSchema.create({
+            inputUrl: originURL,
+            repliedString: string
+          })
+          .then(() => {
+            const shortener = `${protocol}://${host}${url}/${string}`
+            res.render('result', { shortener })
           })
           .catch(err => {
             console.log('data mistake')
           })
+        } else {
+          const shortener = `${protocol}://${host}${url}/${containDuplicate[0].repliedString}`
+          res.render('result', { shortener })
+        }
+      })
+      .catch(err => {
+        console.log('data mistake')
       })
   } else {
     const note = "Please input complete http format"
